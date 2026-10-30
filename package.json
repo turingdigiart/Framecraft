@@ -1,12 +1,14 @@
 ﻿{
-  "name": "@framecraft/workspace",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Framecraft 逐帧工坊：把代码与概念编排成可渲染的教学演示动画",
-  "scripts": {
-    "build:all": "pnpm -r build",
-    "status": "echo 'Framecraft workspace'"
-  },
-  "packageManager": "pnpm@9",
-  "engines": { "node": ">=18" }
+    "name":  "@framecraft/components",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "Framecraft 逐帧工坊：把代码与概念编排成可渲染的教学演示动画",
+    "scripts":  {
+                    "build:all":  "pnpm -r build",
+                    "status":  "echo \u0027Framecraft workspace\u0027"
+                },
+    "packageManager":  "pnpm@9",
+    "engines":  {
+                    "node":  "\u003e=18"
+                }
 }
