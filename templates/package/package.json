@@ -1,0 +1,15 @@
+{
+  "name": "for-loop-animation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "For loop animation demo for EasyC++ course",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render",
+    "dev": "remotion studio"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
