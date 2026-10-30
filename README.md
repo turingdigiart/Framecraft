@@ -71,24 +71,25 @@ pnpm --dir "<目标工程>/demos/for-loop-demo" build
 |---|---|---|
 | `TECH-EASYCPP-RESTARTPROJECTA-001` | `<工程>/demos/` | **待并入**（EasyC++ 的 7 个动画包） |
 
-## 已知缺陷（待修，按"先迁移后修复"顺序排在最后）
+## 缺陷修复记录（2026-10-31）
 
-评估文档 `DEMO_REUSE_ASSESSMENT_v001_20261030.md` 记录的四项静态缺陷，本工具继承：
+四项静态缺陷已全部修复，来源 `DEMO_REUSE_ASSESSMENT_v001_20261030.md`：
 
-| # | 缺陷 | 证据 |
-|---|---|---|
-| 1 | Composition 只有 540 帧，配置写到 750 帧，后段超出合成时长 | `foreach-int-vs-ref-animation/src/Root.tsx:5`、`config.ts:18` |
-| 2 | `int&` 分支给所有元素赋 999，与注释 `{1,999,3}` 不符 | `foreach-int-vs-ref-animation/src/config.ts:55` |
-| 3 | 脚手架脚本硬编码同步盘路径；`create-new-animation.bat` 有 JSX 闭合问题 | `clean-and-reset.bat:6`、`create-new-animation.bat:18` |
-| 4 | `allowBuilds.esbuild` 是文本占位；`engines.node >=16` 而 esbuild 要求 `>=18` | `pnpm-workspace.yaml:6`、根 `package.json` |
+| # | 缺陷 | 修复方式 | 状态 |
+|---|---|---|---|
+| 1 | Composition 540 帧 vs 配置 750 帧 | `Root.tsx` 改为 `const TOTAL_DURATION = STAGES[STAGES.length-1].end`，帧数从配置推导，不再两处手写 | ✅ |
+| 2 | `int&` 分支注释 `{1,999,3}` 与实际不符 | 循环内 `item = 999` 会赋值**每个**元素，注释改为 `{999, 999, 999}` | ✅ |
+| 3 | 脚手架脚本硬编码同步盘路径、JSX 闭合问题 | `create-new-animation.bat` 与 `clean-and-reset.bat` 全部重写：参数化、运行时解析 `TOOLS_ROOT`、不删锁文件、二次确认 | ✅ |
+| 4 | `allowBuilds` 占位 + Node 版本 + 子包旧 npm 锁 | 旧 Demo 根已删除（占位随之消失）；Framecraft 与 demos 的 `engines.node` 均 `>=18`；7 个子包的 `package-lock.json` 已清除，统一用 pnpm | ✅ |
 
-**在修好之前，`scripts/` 里的脚本不能直接运行。**
+**旧脚本备份**：`E:\_sync-quarantine\20261030\framecraft-scripts-before\`
 
-## 从哪里来
+### 现在可以用了
 
-2026-10-30 从 `TuringTechLab/课程/C++/EasyC++/Template/Demo/` 拆分而来：
+```powershell
+# 新建演示包（参数化，不再依赖脚本内的固定路径）
+.\scripts\create-new-animation.bat "<工程目录>" <包名>
 
-- **通用部分**（文档、样板、代码框、脚本）→ 本工具
-- **EasyC++ 专属部分**（7 个动画包）→ 并入 `TECH-EASYCPP-RESTARTPROJECTA-001/demos/`
-
-拆分依据：`DEMO_REUSE_ASSESSMENT_v001_20261030.md`；决策记录待补。
+# 重置依赖（删 node_modules 后重装，保留 pnpm-lock.yaml）
+.\scripts\clean-and-reset.bat "<工程>/demos" -y
+```

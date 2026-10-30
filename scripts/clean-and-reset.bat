@@ -1,54 +1,61 @@
 @echo off
-echo ==========================================
-echo å½»åº•æ¸…ç†å’Œé‡æ–°è®¾ç½® pnpm workspace
-echo ==========================================
-
-cd /d "E:\BaiduSync\BaiduSyncdisk\TuringTechLab\è¯¾ç¨‹\C++\EasyC++\Template\Demo"
-
-echo.
-echo æ­¥éª¤ 1: åˆ é™¤æ ¹ç›®å½•çš„ node_modules å’Œ lock æ–‡ä»¶
-if exist node_modules (
-    echo æ­£åœ¨åˆ é™¤æ ¹ç›®å½• node_modules...
-    rmdir /s /q node_modules
-)
-if exist pnpm-lock.yaml (
-    echo æ­£åœ¨åˆ é™¤ pnpm-lock.yaml...
-    del /q pnpm-lock.yaml
-)
-
-echo.
-echo æ­¥éª¤ 2: åˆ é™¤æ‰€æœ‰å­é¡¹ç›®çš„ node_modules å’Œ lock æ–‡ä»¶
-for /D %%d in (*) do (
-    if exist "%%d\node_modules" (
-        echo æ­£åœ¨åˆ é™¤ %%d\node_modules...
-        rmdir /s /q "%%d\node_modules" 2>nul
-    )
-    if exist "%%d\package-lock.json" (
-        echo æ­£åœ¨åˆ é™¤ %%d\package-lock.json...
-        del /q "%%d\package-lock.json"
-    )
+chcp 65001 >nul
+setlocal
+rem ============================================================
+rem  Framecraft ¡¤ ÖØÖÃÑİÊ¾¹¤×÷ÇøµÄÒÀÀµ
+rem  ÓÃ·¨: clean-and-reset.bat "<demos Ä¿Â¼>" [-y]
+rem  ×÷ÓÃ: É¾³ı node_modules ºóÖØ×°£¨²»É¾ pnpm-lock.yaml£¬ËøÎÄ¼ş±ØĞë±£Áô£©
+rem  ËµÃ÷: ²»Ğ´ËÀÂ·¾¶£»²»´ø -y Ê±»á¶ş´ÎÈ·ÈÏ
+rem ============================================================
+set "DEMOS=%~1"
+set "YES=%~2"
+if "%DEMOS%"=="" goto :usage
+if not exist "%DEMOS%" (
+  echo [ERROR] Ä¿Â¼²»´æÔÚ: %DEMOS%
+  exit /b 1
 )
 
-echo.
-echo æ­¥éª¤ 3: æ¸…ç† pnpm ç¼“å­˜
-pnpm store prune
+if /i not "%YES%"=="-y" (
+  echo ¼´½«É¾³ıÒÔÏÂÄ¿Â¼ÏÂµÄÈ«²¿ node_modules ²¢ÖØ×°:
+  echo   %DEMOS%
+  set /p CONFIRM=È·ÈÏ¼ÌĞø? ÊäÈë Y »Ø³µ:
+  if /i not "%CONFIRM%"=="Y" (
+    echo ÒÑÈ¡Ïû¡£
+    exit /b 1
+  )
+)
+
+echo [1/3] É¾³ı node_modules ...
+if exist "%DEMOS%\node_modules" rmdir /s /q "%DEMOS%\node_modules"
+for /d %%d in ("%DEMOS%\*-animation") do (
+  if exist "%%d\node_modules" rmdir /s /q "%%d\node_modules"
+)
+
+echo [2/3] ÖØĞÂÁ´½Ó Framecraft ...
+if exist "%DEMOS%\link-framecraft.ps1" (
+  pushd "%DEMOS%"
+  powershell -NoProfile -ExecutionPolicy Bypass -File ".\link-framecraft.ps1"
+  popd
+)
+
+echo [3/3] ÖØĞÂ°²×° ...
+pushd "%DEMOS%"
+set CI=true
+call pnpm install
+set "CODE=%errorlevel%"
+popd
+if not "%CODE%"=="0" (
+  echo [ERROR] pnpm install Ê§°Ü£¬ÍË³öÂë %CODE%
+  exit /b %CODE%
+)
 
 echo.
-echo æ­¥éª¤ 4: é‡æ–°å®‰è£… workspace ä¾èµ–
-pnpm install
+echo Íê³É¡£Æô¶¯Ä³¸öÑİÊ¾:
+echo   cd "%DEMOS%"
+echo   pnpm --dir ^<°üÃû^> start
+exit /b 0
 
-echo.
-echo æ­¥éª¤ 5: éªŒè¯å®‰è£…ç»“æœ
-pnpm list --depth 0
-
-echo.
-echo ==========================================
-echo æ¸…ç†å’Œé‡è®¾å®Œæˆï¼
-echo ==========================================
-echo.
-echo ç°åœ¨ä½ å¯ä»¥ä½¿ç”¨ä»¥ä¸‹å‘½ä»¤å¯åŠ¨é¡¹ç›®ï¼š
-echo   pnpm start:foreach-int
-echo   pnpm start:for-loop
-echo   pnpm start:enum
-echo.
-pause
+:usage
+echo ÓÃ·¨: clean-and-reset.bat "^<demos Ä¿Â¼^>" [-y]
+echo   Àı: clean-and-reset.bat "E:\Private\AIDev\TECH-EASYCPP-RESTARTPROJECTA-001\demos" -y
+exit /b 1
